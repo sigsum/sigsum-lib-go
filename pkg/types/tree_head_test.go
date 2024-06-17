@@ -47,13 +47,13 @@ func TestTreeHeadSign(t *testing.T) {
 		{
 			desc:    "invalid: signer error",
 			th:      validTreeHead(t),
-			signer:  &signer.Signer{*newPubBufferInc(t), *newSigBufferInc(t), fmt.Errorf("signing error")},
+			signer:  &signer.Signer{PublicKey: *newPubBufferInc(t), Signature: *newSigBufferInc(t), Error: fmt.Errorf("signing error")},
 			wantErr: true,
 		},
 		{
 			desc:    "valid",
 			th:      validTreeHead(t),
-			signer:  &signer.Signer{*newPubBufferInc(t), *newSigBufferInc(t), nil},
+			signer:  &signer.Signer{PublicKey: *newPubBufferInc(t), Signature: *newSigBufferInc(t)},
 			wantSig: newSigBufferInc(t),
 		},
 	} {

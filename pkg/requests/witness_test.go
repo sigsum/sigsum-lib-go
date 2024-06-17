@@ -40,7 +40,7 @@ func validAddTreeHead() AddTreeHead {
 			Signature: crypto.Signature{3},
 		},
 		OldSize: 1,
-		Proof:   types.ConsistencyProof{[]crypto.Hash{crypto.Hash{4}}},
+		Proof:   types.ConsistencyProof{Path: []crypto.Hash{crypto.Hash{4}}},
 	}
 }
 

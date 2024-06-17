@@ -22,6 +22,10 @@ gofmt:
   stage: test
   script: if gofmt -d . | grep . ; then false ; else true ; fi
 
+go-vet:
+  stage: test
+  script: go vet ./...
+
 build-log-go:
   stage: build-log
   allow_failure: true

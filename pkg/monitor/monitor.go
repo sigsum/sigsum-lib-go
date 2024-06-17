@@ -104,9 +104,9 @@ func MonitorLog(ctx context.Context, client *monitoringLogClient,
 	config := c.applyDefaults()
 	keyHash := crypto.HashBytes(client.logKey[:])
 	for ctx.Err() == nil {
-		updateCtx, _ := context.WithTimeout(ctx, config.QueryInterval)
+		updateCtx, cancel := context.WithTimeout(ctx, config.QueryInterval)
 		if state.TreeHead.Size == state.NextLeafIndex {
-			cth, err := client.getTreeHead(ctx, &state.TreeHead)
+			cth, err := client.getTreeHead(updateCtx, &state.TreeHead)
 			if err != nil {
 				config.Callbacks.Alert(keyHash, err)
 			} else if cth.Size > state.TreeHead.Size {
@@ -121,7 +121,7 @@ func MonitorLog(ctx context.Context, client *monitoringLogClient,
 			}
 			var allLeaves []types.Leaf
 			var err error
-			allLeaves, glState, err = client.getLeaves(ctx, glState, &state.TreeHead,
+			allLeaves, glState, err = client.getLeaves(updateCtx, glState, &state.TreeHead,
 				requests.Leaves{StartIndex: state.NextLeafIndex, EndIndex: end})
 			if err != nil {
 				config.Callbacks.Alert(keyHash, err)
@@ -135,6 +135,7 @@ func MonitorLog(ctx context.Context, client *monitoringLogClient,
 		}
 		// Waits until end of interval
 		<-updateCtx.Done()
+		cancel()
 	}
 }
 
@@ -155,10 +156,10 @@ func StartMonitoring(
 		}
 
 		wg.Add(1)
-		go func() {
+		go func(l policy.Entity) {
 			MonitorLog(ctx, newMonitoringLogClient(&l.PublicKey, l.URL), initialState, config)
 			wg.Done()
-		}()
+		}(l)
 	}
 	ch := make(chan struct{})
 	go func() {

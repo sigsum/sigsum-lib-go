@@ -72,7 +72,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if len(proof) > 0 {
-		if err := (&types.ConsistencyProof{proof}).ToASCII(os.Stdout); err != nil {
+		if err := (&types.ConsistencyProof{Path: proof}).ToASCII(os.Stdout); err != nil {
 			log.Fatal(err)
 		}
 	}
